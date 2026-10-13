@@ -18,7 +18,7 @@ public class Projectile : MonoBehaviour
     {
        float step = speed * Time.deltaTime;
        transform.position = Vector3.MoveTowards(transform.position, target_position, step);
-         timer -= Time.deltaTime;
+        timer -= Time.deltaTime;
         if(timer < 0)
         {
             Destroy(gameObject);

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
+
 public class PlayerController : MonoBehaviour
 {
     float Speed = 3.5f;
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour
        if(Input.GetKeyDown(KeyCode.Space) && cooldown)
         {
             Shoot();
+            cooldownTimer = 0.75f;
         }
         if(Xdirection > 0)
         {
@@ -60,6 +62,15 @@ public class PlayerController : MonoBehaviour
         {
             facing = "Down";
         }
+        if(cooldownTimer == 0.75f)
+        {
+            cooldown = false;
+        }
+        else if(cooldownTimer <= 0)
+        {
+            cooldown = true;
+        }
+        cooldownTimer -= Time.deltaTime;
     }
 
     void AnimationUpdate()

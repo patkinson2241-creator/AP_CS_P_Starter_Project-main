@@ -7,6 +7,7 @@ public class PlayerProjectile : MonoBehaviour
     float speed = 20;
     Vector3 direction;
     float timer = 3.5f;
+
     void Start()
     {
         
@@ -14,7 +15,12 @@ public class PlayerProjectile : MonoBehaviour
 
     void Update()
     {
-        
+        transform.position += speed * Time.deltaTime * direction;
+        timer -= Time.deltaTime;
+        if(timer < 0)
+        {
+            Destroy(gameObject);
+        }
     }
     public void SetDirection(String facing)
     {
