@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
         Yvector = Ydirection * Speed * Time.deltaTime;
         transform.position += new Vector3 (Xvector, Yvector, 0);
         AnimationUpdate();
-       if(Input.GetKeyDown(KeyCode.Space) && cooldown)
+        if(Input.GetKeyDown(KeyCode.Space) && cooldown)
         {
             Shoot();
             cooldownTimer = 0.75f;
@@ -71,6 +71,19 @@ public class PlayerController : MonoBehaviour
             cooldown = true;
         }
         cooldownTimer -= Time.deltaTime;
+        //these next things are just for testing, remove later
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            print(""+ coins +" coins");
+        }
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            print(""+ health +" health");
+        }
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            print ("max health is "+ maxhealth +"");
+        }
     }
 
     void AnimationUpdate()
@@ -150,14 +163,19 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-            string currentScene = SceneManager.GetActiveScene().name;
-            Debug.Log(currentScene);
-            SceneManager.LoadScene(currentScene);
-            print("You died!");
+        string currentScene = SceneManager.GetActiveScene().name;
+        Debug.Log(currentScene);
+        SceneManager.LoadScene(currentScene);
+        print("You died!");
+        if (coins > 1)
+        {
+            coins = coins / 2;
+        }
     }
     void Shoot()
     {
         GameObject fireball_copy = Instantiate(fireball_prefab, spawnpoint.position, quaternion.identity);
         PlayerProjectile projectile_script = fireball_copy.GetComponent<PlayerProjectile>();
+        projectile_script.SetDirection(facing);
     }
 }

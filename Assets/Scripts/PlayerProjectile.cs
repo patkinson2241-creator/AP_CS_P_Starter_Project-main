@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PlayerProjectile : MonoBehaviour
 {
-    float speed = 20;
+    float speed = 15;
     Vector3 direction;
     float timer = 3.5f;
 
     void Start()
     {
-        
+
     }
 
     void Update()
