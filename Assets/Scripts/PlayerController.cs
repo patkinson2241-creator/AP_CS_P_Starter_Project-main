@@ -71,19 +71,6 @@ public class PlayerController : MonoBehaviour
             cooldown = true;
         }
         cooldownTimer -= Time.deltaTime;
-        //these next things are just for testing, remove later
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            print(""+ coins +" coins");
-        }
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            print(""+ health +" health");
-        }
-        if(Input.GetKeyDown(KeyCode.T))
-        {
-            print ("max health is "+ maxhealth +"");
-        }
     }
 
     void AnimationUpdate()
@@ -167,10 +154,6 @@ public class PlayerController : MonoBehaviour
         Debug.Log(currentScene);
         SceneManager.LoadScene(currentScene);
         print("You died!");
-        if (coins > 1)
-        {
-            coins = coins / 2;
-        }
     }
     void Shoot()
     {
