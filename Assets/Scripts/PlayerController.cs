@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     int health = 3;
     int maxhealth = 5;
     bool cooldown = true;
-    float cooldownTimer = 0.75f;
+    float cooldownTimer = 0.5f;
     String facing;
     [SerializeField]GameObject fireball_prefab;
     [SerializeField]Transform spawnpoint;
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space) && cooldown)
         {
             Shoot();
-            cooldownTimer = 0.75f;
+            cooldownTimer = 0.5f;
         }
         if(Xdirection > 0)
         {
@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
         {
             facing = "Down";
         }
-        if(cooldownTimer == 0.75f)
+        if(cooldownTimer == 0.5f)
         {
             cooldown = false;
         }
@@ -151,7 +151,6 @@ public class PlayerController : MonoBehaviour
     void Die()
     {
         string currentScene = SceneManager.GetActiveScene().name;
-        Debug.Log(currentScene);
         SceneManager.LoadScene(currentScene);
         print("You died!");
     }
