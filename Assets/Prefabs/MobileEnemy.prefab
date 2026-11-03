@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 865d5d4d919324ea0b0c22ab6b798e3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  itemDrop: {fileID: 8928701524657299959, guid: 2d2bc4cf5fda5c740b9cedcdbc7c87ac, type: 3}
   patrolpoints:
   - {fileID: 0}
   - {fileID: 0}

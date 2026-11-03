@@ -1,7 +1,9 @@
 using System;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
@@ -20,16 +22,17 @@ public class PlayerController : MonoBehaviour
     int maxhealth = 5;
     bool cooldown = true;
     float cooldownTimer = 0.5f;
+    GameObject currentEnemy;
     String facing;
     [SerializeField]GameObject fireball_prefab;
     [SerializeField]Transform spawnpoint;
+    [SerializeField] GameObject Attackbox;
 
     private void Start()
     {
        animator = GetComponentInChildren<Animator>();
        renderer = GetComponentInChildren<SpriteRenderer>();
-       
-       
+       Attackbox.SetActive(false);
     }
 
     private void Update()
@@ -41,6 +44,11 @@ public class PlayerController : MonoBehaviour
         Yvector = Ydirection * Speed * Time.deltaTime;
         transform.position += new Vector3 (Xvector, Yvector, 0);
         AnimationUpdate();
+        if(Input.GetKeyDown(KeyCode.E) && cooldownTimer <= 0 && currentEnemy != null)
+        {
+            currentEnemy.GetComponent<EnemyController>().ChangeHealth(-1.5f);
+            cooldownTimer = 0.25f;
+        }
         if(Input.GetKeyDown(KeyCode.Space) && cooldown)
         {
             Shoot();
@@ -49,18 +57,22 @@ public class PlayerController : MonoBehaviour
         if(Xdirection > 0)
         {
             facing = "Right";
+            Attackbox.transform.position = transform.position + new Vector3(0.75f, 0.75f, 0);
         }
         else if(Xdirection < 0)
         {
             facing = "Left";
+            Attackbox.transform.position = transform.position + new Vector3(-0.75f, 0.75f, 0);
         }
         else if(Ydirection > 0)
         {
             facing = "Up";
+            Attackbox.transform.position = transform.position + new Vector3(0, 1.5f, 0);
         }
         else if(Ydirection < 0)
         {
             facing = "Down";
+            Attackbox.transform.position = transform.position + new Vector3(0, -0.5f, 0);
         }
         if(cooldownTimer == 0.5f)
         {
@@ -100,21 +112,32 @@ public class PlayerController : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Coin"))
+        if(other.gameObject.CompareTag("Coin"))
         {
             ChangeCoins(1);
             Destroy(other.gameObject);
            
         }
-        else if (other.gameObject.CompareTag("HealthPotion"))
+        else if(other.gameObject.CompareTag("HealthPotion"))
         {
                 ChangeHealth(1);
                 Destroy(other.gameObject);
         }    
-        else if (other.gameObject.CompareTag("E_Fireball"))
+        else if(other.gameObject.CompareTag("E_Fireball"))
         {
            ChangeHealth(-2);
            Destroy(other.gameObject);
+        }
+        else if(other.gameObject.CompareTag("Enemy"))
+        {
+            currentEnemy = other.gameObject;
+        }
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if(other.gameObject.CompareTag("Enemy"))
+        {
+            currentEnemy = other.gameObject;
         }
     }
     void OnCollisionEnter2D(Collision2D other)

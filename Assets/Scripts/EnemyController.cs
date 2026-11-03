@@ -10,6 +10,8 @@ public class EnemyController : MonoBehaviour
     bool inRange = false;
     bool inAttackRange = false;
     int patrolNumber = 0;
+    float health = 6;
+    [SerializeField] GameObject itemDrop;
     [SerializeField] private List<Transform> patrolpoints = new List<Transform>();
     public void Start()
     {
@@ -56,5 +58,21 @@ public class EnemyController : MonoBehaviour
             inRange = false;
             target = null;
         }
+    }
+    public void ChangeHealth(float amount)
+    {
+        health += amount;
+        if(health <= 0)
+        {
+            Die();
+        }
+        print("The Enemy has "+ health +" health.");
+    }
+
+    void Die()
+    {
+        Instantiate(itemDrop, transform.position, Quaternion.identity);
+        Destroy(gameObject);
+        print("Killed an Enemy.");
     }
 }
