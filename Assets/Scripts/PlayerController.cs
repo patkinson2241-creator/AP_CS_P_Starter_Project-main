@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using UnityEditor.Callbacks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
@@ -22,34 +23,52 @@ public class PlayerController : MonoBehaviour
     int maxhealth = 5;
     bool cooldown = true;
     float cooldownTimer = 0.5f;
+    int jumpsleft;
+    int maxjumps = 2;
+    bool platformer;
+    Scene currentScene;
     GameObject currentEnemy;
     String facing;
     [SerializeField]GameObject fireball_prefab;
     [SerializeField]Transform spawnpoint;
     [SerializeField] GameObject Attackbox;
-
+    StatManager manager;
+    Rigidbody2D rb;
+    [SerializeField] float jumpForce;
     private void Start()
     {
-       animator = GetComponentInChildren<Animator>();
-       renderer = GetComponentInChildren<SpriteRenderer>();
-       Attackbox.SetActive(false);
+        rb = GetComponent<Rigidbody2D>();
+        manager = FindAnyObjectByType<StatManager>();
+        animator = GetComponentInChildren<Animator>();
+        renderer = GetComponentInChildren<SpriteRenderer>();
+        Attackbox.SetActive(false);
+        currentScene = SceneManager.GetActiveScene();
+        if(currentScene.name == "Overworld")
+        {
+            rb.gravityScale = 0;
+            platformer = false;
+        }
+        else
+        {
+            rb.gravityScale = 2;
+            platformer = true;
+        }
+        jumpsleft = maxjumps;
     }
 
     private void Update()
     {
         
         Xdirection = Input.GetAxisRaw ("Horizontal");
-        Ydirection = Input.GetAxisRaw ("Vertical");
         Xvector = Xdirection * Speed * Time.deltaTime;
-        Yvector = Ydirection * Speed * Time.deltaTime;
-        transform.position += new Vector3 (Xvector, Yvector, 0);
+        
         AnimationUpdate();
         if(Input.GetKeyDown(KeyCode.E) && cooldownTimer <= 0 && currentEnemy != null)
         {
             currentEnemy.GetComponent<EnemyController>().ChangeHealth(-1.5f);
             cooldownTimer = 0.25f;
         }
-        if(Input.GetKeyDown(KeyCode.Space) && cooldown)
+        if(Input.GetKeyDown(KeyCode.R) && cooldown)
         {
             Shoot();
             cooldownTimer = 0.5f;
@@ -64,16 +83,7 @@ public class PlayerController : MonoBehaviour
             facing = "Left";
             Attackbox.transform.position = transform.position + new Vector3(-0.75f, 0.75f, 0);
         }
-        else if(Ydirection > 0)
-        {
-            facing = "Up";
-            Attackbox.transform.position = transform.position + new Vector3(0, 1.5f, 0);
-        }
-        else if(Ydirection < 0)
-        {
-            facing = "Down";
-            Attackbox.transform.position = transform.position + new Vector3(0, -0.5f, 0);
-        }
+     
         if(cooldownTimer == 0.5f)
         {
             cooldown = false;
@@ -83,6 +93,33 @@ public class PlayerController : MonoBehaviour
             cooldown = true;
         }
         cooldownTimer -= Time.deltaTime;
+        if(!platformer)
+        {
+            Ydirection = Input.GetAxisRaw ("Vertical");
+            Yvector = Ydirection * Speed * Time.deltaTime;
+            
+            if(Ydirection > 0)
+            {
+            facing = "Up";
+            Attackbox.transform.position = transform.position + new Vector3(0, 1.5f, 0);
+            }
+            else if(Ydirection < 0)
+            {
+            facing = "Down";
+            Attackbox.transform.position = transform.position + new Vector3(0, -0.5f, 0);
+            }
+
+            transform.position += new Vector3 (Xvector, Yvector, 0);
+        }
+        else
+        {
+            transform.position += new Vector3 (Xvector, 0, 0);
+        }
+        if((Input.GetKeyDown(KeyCode.Space)||Input.GetKeyDown(KeyCode.UpArrow)) && jumpsleft >= 1 && platformer)
+        {
+            rb.AddForceY(jumpForce, ForceMode2D.Impulse);
+            jumpsleft -= 1;
+        }
     }
 
     void AnimationUpdate()
@@ -114,18 +151,18 @@ public class PlayerController : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Coin"))
         {
-            ChangeCoins(1);
+            manager.ChangeCoins(1);
             Destroy(other.gameObject);
            
         }
         else if(other.gameObject.CompareTag("HealthPotion"))
         {
-                ChangeHealth(1);
-                Destroy(other.gameObject);
+            manager.ChangeHealth(1);
+            Destroy(other.gameObject);
         }    
         else if(other.gameObject.CompareTag("E_Fireball"))
         {
-           ChangeHealth(-2);
+           manager.ChangeHealth(-2);
            Destroy(other.gameObject);
         }
         else if(other.gameObject.CompareTag("Enemy"))
@@ -144,38 +181,12 @@ public class PlayerController : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Spikes"))
         {
-            ChangeHealth(-1);
+            manager.ChangeHealth(-1);
         }
-    }
-
-    void ChangeCoins(int amount)
-    {
-        coins += amount;  //Same as coins = coins + 1;
-            
-        print("You have "+ coins +" coins.");
-    }
-
-    void ChangeHealth(int amount)
-    {
-        health += amount;
-        print("You have "+ health +" health.");
-        if(health <= 0)
+        else if(other.gameObject.CompareTag("Ground"))
         {
-            Die();
+            jumpsleft = maxjumps;
         }
-        if(health > maxhealth)
-        {
-            health = maxhealth;
-            print("You cannot gain any more health.");
-            
-        }
-    }
-
-    void Die()
-    {
-        string currentScene = SceneManager.GetActiveScene().name;
-        SceneManager.LoadScene(currentScene);
-        print("You died!");
     }
     void Shoot()
     {
