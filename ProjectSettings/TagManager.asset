@@ -13,7 +13,8 @@ TagManager:
   - HealthPotion
   - E_Fireball
   - P_Fireball
-  - Zoomtrigger
+  - Platform
+  - Boots
   layers:
   - Default
   - TransparentFX

@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
     bool cooldown = true;
     float cooldownTimer = 0.5f;
     int jumpsleft;
-    int maxjumps = 2;
     bool platformer;
     Scene currentScene;
     GameObject currentEnemy;
@@ -53,7 +52,7 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = 2;
             platformer = true;
         }
-        jumpsleft = maxjumps;
+        jumpsleft = manager.maxjumps;
     }
 
     private void Update()
@@ -169,6 +168,12 @@ public class PlayerController : MonoBehaviour
         {
             currentEnemy = other.gameObject;
         }
+        else if(other.gameObject.CompareTag("Boots"))
+        {
+            Destroy(other.gameObject);
+            manager.maxjumps = 2;
+            jumpsleft = manager.maxjumps;
+        }
     }
     void OnTriggerExit2D(Collider2D other)
     {
@@ -185,7 +190,11 @@ public class PlayerController : MonoBehaviour
         }
         else if(other.gameObject.CompareTag("Ground"))
         {
-            jumpsleft = maxjumps;
+            jumpsleft = manager.maxjumps;
+        }
+        else if(other.gameObject.CompareTag("Platform"))
+        {
+        
         }
     }
     void Shoot()
