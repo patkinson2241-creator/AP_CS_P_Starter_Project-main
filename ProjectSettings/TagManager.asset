@@ -15,6 +15,7 @@ TagManager:
   - P_Fireball
   - Platform
   - Boots
+  - Lader
   layers:
   - Default
   - TransparentFX

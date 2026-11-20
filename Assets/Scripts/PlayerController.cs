@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     float cooldownTimer = 0.5f;
     int jumpsleft;
     bool platformer;
+    bool onladder;
     Scene currentScene;
     GameObject currentEnemy;
     String facing;
@@ -82,16 +83,7 @@ public class PlayerController : MonoBehaviour
             facing = "Left";
             Attackbox.transform.position = transform.position + new Vector3(-0.75f, 0.75f, 0);
         }
-     
-        if(cooldownTimer == 0.5f)
-        {
-            cooldown = false;
-        }
-        else if(cooldownTimer <= 0)
-        {
-            cooldown = true;
-        }
-        cooldownTimer -= Time.deltaTime;
+        transform.position += new Vector3 (Xvector, 0, 0);
         if(!platformer)
         {
             Ydirection = Input.GetAxisRaw ("Vertical");
@@ -104,16 +96,21 @@ public class PlayerController : MonoBehaviour
             }
             else if(Ydirection < 0)
             {
-            facing = "Down";
-            Attackbox.transform.position = transform.position + new Vector3(0, -0.5f, 0);
+                facing = "Down";
+                Attackbox.transform.position = transform.position + new Vector3(0, -0.5f, 0);
             }
-
             transform.position += new Vector3 (Xvector, Yvector, 0);
         }
-        else
+        if(cooldownTimer == 0.5f)
         {
-            transform.position += new Vector3 (Xvector, 0, 0);
+            cooldown = false;
         }
+        else if(cooldownTimer <= 0)
+        {
+            cooldown = true;
+        }
+        cooldownTimer -= Time.deltaTime;
+       
         if((Input.GetKeyDown(KeyCode.Space)||Input.GetKeyDown(KeyCode.UpArrow)) && jumpsleft >= 1 && platformer)
         {
             rb.AddForceY(jumpForce, ForceMode2D.Impulse);
@@ -174,12 +171,24 @@ public class PlayerController : MonoBehaviour
             manager.maxjumps = 2;
             jumpsleft = manager.maxjumps;
         }
+        else if(other.gameObject.CompareTag("Lader"))
+        {
+            platformer = false;
+            onladder = true;
+            rb.gravityScale = 0;
+        }
     }
     void OnTriggerExit2D(Collider2D other)
     {
         if(other.gameObject.CompareTag("Enemy"))
         {
             currentEnemy = other.gameObject;
+        }
+        else if(other.gameObject.CompareTag("Lader"))
+        {
+            platformer = true;
+            onladder = false;
+            rb.gravityScale = 2;
         }
     }
     void OnCollisionEnter2D(Collision2D other)
